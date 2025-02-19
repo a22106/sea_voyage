@@ -1,0 +1,54 @@
+from setuptools import setup, find_packages
+import sys
+import re
+
+with open("README.md", "r") as f:
+    readme_text = f.read()
+    
+VERSIONFILE = 'sea_voyage/_version.py'
+verstrline = open(VERSIONFILE).read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    verstr = mo.group(1)
+else:
+    raise RuntimeError(f"Unable to find version string in {VERSIONFILE}.")
+
+major_version, minor_version = sys.version_info[:2]
+if not (major_version == 3 and 7 <= minor_version <= 13):
+    sys.stderr.write("Sorry, only Python 3.9 - 3.13 are "
+                     "supported at this time.\n")
+    exit(1)
+
+setup(
+    name="sea_voyage",
+    version=verstr,
+    description="An improved version of searoute package for calculating the shortest sea route between two points on Earth.",
+    license="Apache 2.0",
+    keywords="sea route, shortest path, graph, geojson, networkx",
+    author="Byeonggong Hwang",
+    author_email="bk22106@gmail.com",
+    url="https://github.com/a22106/sea_voyage",
+    long_description=readme_text,
+    packages=find_packages(),
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Topic :: Scientific/Engineering :: GIS",
+    ],
+    python_requires=">=3.11",
+    install_requires=[
+        "geojson",
+        "networkx",
+    ],
+)
