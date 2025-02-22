@@ -2,6 +2,10 @@ from setuptools import setup, find_packages
 import sys
 import re
 
+# requirements.txt 파일 읽기
+with open("requirements.txt", "r", encoding="utf-8") as f:
+    requirements = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
 with open("README.md", "r", encoding="utf-8") as f:
     readme_text = f.read()
     
@@ -48,8 +52,5 @@ setup(
         "Topic :: Scientific/Engineering :: GIS",
     ],
     python_requires=">=3.11",
-    install_requires=[
-        "geojson",
-        "networkx",
-    ],
+    install_requires=requirements,
 )
