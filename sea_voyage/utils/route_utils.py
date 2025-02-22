@@ -1,6 +1,8 @@
 # route_utils.py
 import geojson
 import geopandas as gpd
+import os
+from pathlib import Path
 
 import searoute as sr
 from searoute.utils import distance
@@ -8,6 +10,8 @@ from searoute.data.marnet_dict import edge_list as marnet_e, node_list as marnet
 
 from sea_voyage.classes.m_network import MNetwork
 from sea_voyage.utils.geojson_utils import load_geojson
+from sea_voyage.settings import MARNET_DIR
+
 
 def convert_gpkg_to_geojson(gpkg_file: str, output_geojson: str = ""):
     layer_name = "type"  # 변환할 레이어 이름 (gpkg 파일 내의 실제 레이어 이름으로 변경)
@@ -30,23 +34,29 @@ def make_searoute_nodes(nodes: list[tuple[float, float]]):
         searoute_nodes[node] = {'x': node[0], 'y': node[1]}
     return searoute_nodes
 
-def get_marnet() -> sr.Marnet:
-    return sr.from_nodes_edges_set(sr.Marnet(), marnet_n, marnet_e)
+def get_marnet() -> MNetwork:
+    """기본 MARNET 네트워크 반환"""
+    return MNetwork()
 
 def get_m_network_5km() -> MNetwork:
-    return MNetwork().load_geojson('./data/marnet/marnet_plus_5km.geojson')
+    """5km 간격의 확장된 MARNET 네트워크 반환"""
+    return MNetwork().load_geojson(str(MARNET_DIR / 'marnet_plus_5km.geojson'))
 
 def get_m_network_10km() -> MNetwork:
-    return MNetwork().load_geojson('./data/marnet/marnet_plus_10km.geojson')
+    """10km 간격의 확장된 MARNET 네트워크 반환"""
+    return MNetwork().load_geojson(str(MARNET_DIR / 'marnet_plus_10km.geojson'))
 
 def get_m_network_20km() -> MNetwork:
-    return MNetwork().load_geojson('./data/marnet/marnet_plus_20km.geojson')
+    """20km 간격의 확장된 MARNET 네트워크 반환"""
+    return MNetwork().load_geojson(str(MARNET_DIR / 'marnet_plus_20km.geojson'))
 
 def get_m_network_50km() -> MNetwork:
-    return MNetwork().load_geojson('./data/marnet/marnet_plus_50km.geojson')
+    """50km 간격의 확장된 MARNET 네트워크 반환"""
+    return MNetwork().load_geojson(str(MARNET_DIR / 'marnet_plus_50km.geojson'))
 
 def get_m_network_100km() -> MNetwork:
-    return MNetwork().load_geojson('./data/marnet/marnet_plus_100km.geojson')
+    """100km 간격의 확장된 MARNET 네트워크 반환"""
+    return MNetwork().load_geojson(str(MARNET_DIR / 'marnet_plus_100km.geojson'))
 
 def get_marnet_sample() -> MNetwork:
     return MNetwork().load_geojson('./data/samples/cross_land.geojson')
