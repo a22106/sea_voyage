@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 import sys
 import re
 
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     readme_text = f.read()
     
 VERSIONFILE = 'sea_voyage/_version.py'
-verstrline = open(VERSIONFILE).read()
+verstrline = open(VERSIONFILE, encoding="utf-8").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)
 if mo:
@@ -30,6 +30,7 @@ setup(
     author_email="bk22106@gmail.com",
     url="https://github.com/a22106/sea_voyage",
     long_description=readme_text,
+    long_description_content_type="text/markdown",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
