@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 import sys
 import re
 
-# requirements.txt 파일 읽기
 with open("requirements.txt", "r", encoding="utf-8") as f:
     requirements = [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
@@ -53,4 +52,8 @@ setup(
     ],
     python_requires=">=3.11",
     install_requires=requirements,
+    package_data={
+        'sea_voyage': ['data/geojson/marnet/*'],
+    },
+    include_package_data=True,
 )
