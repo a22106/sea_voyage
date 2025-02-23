@@ -1,6 +1,6 @@
 import geojson
 import folium
-from sea_voyage.classes.m_network import MNetwork
+from seavoyage.classes.m_network import MNetwork
 
 def map_folium(
     geojson_data: dict | geojson.FeatureCollection, 

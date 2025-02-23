@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 # 패키지 루트 디렉토리 설정
-PACKAGE_ROOT = Path(__file__).parent  # settings.py의 부모 디렉토리(sea_voyage)를 루트로 설정
+PACKAGE_ROOT = Path(__file__).parent  # settings.py의 부모 디렉토리(seavoyage)를 루트로 설정
 
 # 개발 환경과 설치 환경에서 모두 작동하도록 데이터 디렉토리 설정
 if os.environ.get("DEVELOPMENT_MODE"):

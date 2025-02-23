@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 with open("README.md", "r", encoding="utf-8") as f:
     readme_text = f.read()
     
-VERSIONFILE = 'sea_voyage/_version.py'
+VERSIONFILE = 'seavoyage/_version.py'
 verstrline = open(VERSIONFILE, encoding="utf-8").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)
@@ -24,14 +24,14 @@ if not (major_version == 3 and 7 <= minor_version <= 13):
     exit(1)
 
 setup(
-    name="sea_voyage",
+    name="seavoyage",
     version=verstr,
     description="An improved version of searoute package for calculating the shortest sea route between two points on Earth.",
     license="Apache 2.0",
     keywords="sea route, shortest path, graph, geojson, networkx",
     author="Byeonggong Hwang",
     author_email="bk22106@gmail.com",
-    url="https://github.com/a22106/sea_voyage",
+    url="https://github.com/a22106/seavoyage",
     long_description=readme_text,
     long_description_content_type="text/markdown",
     packages=find_packages(),
@@ -53,7 +53,7 @@ setup(
     python_requires=">=3.11",
     install_requires=requirements,
     package_data={
-        'sea_voyage': ['data/geojson/marnet/*'],
+        'seavoyage': ['data/geojson/marnet/*'],
     },
     include_package_data=True,
 )

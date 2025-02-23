@@ -4,7 +4,7 @@ from shapely import LineString
 import geojson
 import geopandas as gpd
 
-from sea_voyage.classes.m_network import MNetwork
+from seavoyage.classes.m_network import MNetwork
 from shapely import MultiPoint, MultiPolygon, Point
 from shapely.prepared import prep, PreparedGeometry
 

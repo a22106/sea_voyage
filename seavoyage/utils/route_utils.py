@@ -8,9 +8,9 @@ import searoute as sr
 from searoute.utils import distance
 from searoute.data.marnet_dict import edge_list as marnet_e, node_list as marnet_n
 
-from sea_voyage.classes.m_network import MNetwork
-from sea_voyage.utils.geojson_utils import load_geojson
-from sea_voyage.settings import MARNET_DIR
+from seavoyage.classes.m_network import MNetwork
+from seavoyage.utils.geojson_utils import load_geojson
+from seavoyage.settings import MARNET_DIR
 
 
 def convert_gpkg_to_geojson(gpkg_file: str, output_geojson: str = ""):

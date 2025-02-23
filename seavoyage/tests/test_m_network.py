@@ -1,19 +1,19 @@
 import pytest
 import geojson
 
-from sea_voyage.classes.m_network import MNetwork
+from seavoyage.classes.m_network import MNetwork
 
 @pytest.fixture
 def marine_network_100km():
     marnet = MNetwork()
-    marnet.load_geojson("sea_voyage/data/marnet/marnet_plus_100km.geojson")
+    marnet.load_geojson("seavoyage/data/marnet/marnet_plus_100km.geojson")
     return marnet
 
 
 @pytest.fixture
 def marine_network_5km():
     marnet = MNetwork()
-    marnet.load_geojson("sea_voyage/data/marnet/marnet_plus_5km.geojson")
+    marnet.load_geojson("seavoyage/data/marnet/marnet_plus_5km.geojson")
     return marnet
 
 @pytest.fixture

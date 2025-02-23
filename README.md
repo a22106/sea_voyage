@@ -20,12 +20,12 @@ Sea Voyage는 지구상의 두 지점 간 최단 해상 경로를 계산하는 P
 
 ## 설치 방법
 ```bash
-pip install sea-voyage
+pip install seavoyage
 ```
 
 ## 사용 예시
 ```python
-import sea_voyage as sv
+import seavoyage as sv
 
 # 출발지와 목적지 좌표 설정
 origin = [0.3515625, 50.064191736659104]

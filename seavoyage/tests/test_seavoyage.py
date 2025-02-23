@@ -1,5 +1,5 @@
 import pytest
-import sea_voyage as sv
+import seavoyage as sv
 
 @pytest.fixture
 def start_point():
