@@ -9,11 +9,9 @@ Sea Voyage는 지구상의 두 지점 간 최단 해상 경로를 계산하는 P
 
 ## 주요 개선사항
 1. 성능 최적화
-   - 경로 계산 속도 향상
-2. 코드 구조 개선
-   - TODO: 코드 구조 개선
-3. 기능 추가
-   - 다양한 Graph 형태 지원
+   - TODO: 경로 계산 속도 향상
+2. 기능 추가
+   - 다양한 해상도의 Graph 형태 지원(5km, 10km, 25km, 50km, 100km)
    - 다양하고 쉬운 방법으로 graph에 node 및 edge 추가 가능
    - 육지를 지나거나 육지 위의 node 및 edge 제거 가능
    - TODO: 새로운 해상 경로 옵션 추가
@@ -24,19 +22,36 @@ pip install seavoyage
 ```
 
 ## 사용 예시
+
+### 1. 기본 경로 생성
 ```python
 import seavoyage as sv
 
-# 출발지와 목적지 좌표 설정
+# 출발지와 목적지 좌표 설정(longitude, latitude)
 origin = [0.3515625, 50.064191736659104]
 destination = [117.42187500000001, 39.36827914916014]
 
 # 경로 계산
-route = sv.searoute(origin, destination)
+route = sv.voyage(origin, destination)
+
+# 거리 및 단위 출력
+print("{:.1f} {}".format(route.properties['length'], route.properties['units'])) # 
+```
+
+### 2. 해상도 변경
+```python
+import seavoyage as sv
+
+# 해상도 변경
+m_network = sv.get_m_network_5km()
+
+# 경로 계산
+route = sv.voyage(origin, destination, M=m_network)
 
 # 거리 및 단위 출력
 print("{:.1f} {}".format(route.properties['length'], route.properties['units']))
 ```
+
 
 ## 라이선스
 이 프로젝트는 Apache License 2.0 라이선스 하에 배포됩니다.
