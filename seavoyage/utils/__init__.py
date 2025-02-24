@@ -1,10 +1,14 @@
 from .geojson_utils import *
 from .map_utils import *
 from .route_utils import *
+from .shapely_utils import *
 
 __all__ = (
+    # geojson_utils
     ["load_geojson"]
+    # map_utils
     + ["map_folium", "map_folium_marnet"]
+    # route_utils
     + [
         "convert_gpkg_to_geojson",
         "make_searoute_nodes",
@@ -17,5 +21,12 @@ __all__ = (
         "get_marnet_sample",
         "get_additional_points",
         "create_geojson_from_marnet",
+    ]
+    # shapely_utils
+    + [
+        "extract_linestrings_from_geojson",
+        "extract_linestrings_from_geojson_file",
+        "is_valid_edge",
+        "remove_edges_cross_land",
     ]
 )
