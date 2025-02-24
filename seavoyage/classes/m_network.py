@@ -3,16 +3,18 @@ import geojson
 from searoute import Marnet
 from searoute.utils import distance
 from shapely import LineString
+from seavoyage.utils.shapely_utils import is_valid_edge
 
 class MNetwork(Marnet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def add_node_with_edges(self, node: tuple[float, float], threshold: float = 100.0):
+    def add_node_with_edges(self, node: tuple[float, float], threshold: float = 100.0, land_polygon = None):
         """
         새로운 노드를 추가하고 임계값 내의 기존 노드들과 자동으로 엣지를 생성합니다.
         :param node: 추가할 노드의 (longitude, latitude) 좌표
         :param threshold: 엣지를 생성할 거리 임계값(km)
+        :param land_polygon: 육지 폴리곤 (shapely MultiPolygon)
         :return: 생성된 엣지들의 리스트 [(node1, node2, weight), ...]
         """
         if threshold <= 0 or not isinstance(threshold, (int, float)):
@@ -23,6 +25,7 @@ class MNetwork(Marnet):
         
         if node in self.nodes:
             return []
+        
         # 노드 추가
         self.add_node(node)
         
@@ -36,19 +39,24 @@ class MNetwork(Marnet):
                 
             dist = distance(node, existing_node, units="km")
             if dist <= threshold:
+                # 육지 폴리곤이 주어진 경우, 엣지가 육지를 통과하는지 검사
+                if land_polygon:
+                    line = LineString([node, existing_node])
+                    if not is_valid_edge(line, land_polygon):
+                        continue
+                
                 self.add_edge(node, existing_node, weight=dist)
                 created_edges.append((node, existing_node, dist))
                 
-        for edge in created_edges:
-            self.add_edge(edge[0], edge[1], weight=edge[2])
         return created_edges
 
-    def add_nodes_with_edges(self, nodes: list[tuple[float, float]], threshold: float = 100.0):
+    def add_nodes_with_edges(self, nodes: list[tuple[float, float]], threshold: float = 100.0, land_polygon = None):
         """
         여러 노드들을 추가하고 임계값 내의 모든 노드들(기존 + 새로운)과 자동으로 엣지를 생성합니다.
 
         :param nodes: 추가할 노드들의 [(longitude, latitude), ...] 좌표 리스트
         :param threshold: 엣지를 생성할 거리 임계값(km)
+        :param land_polygon: 육지 폴리곤 (shapely MultiPolygon)
         :return: 생성된 엣지들의 리스트 [(node1, node2, weight), ...]
         """
         if not isinstance(nodes, list):
@@ -63,11 +71,11 @@ class MNetwork(Marnet):
         
         # 각 새로운 노드에 대해 처리
         for node in nodes:
-            # 기존 노드들과의 엣지 생성
-            edges = self.add_node_with_edges(node, threshold)
+            # 기존 노드들과의 엣지 생성 (육지 통과 검사 포함)
+            edges = self.add_node_with_edges(node, threshold, land_polygon)
             all_created_edges.extend(edges)
             
-            # 이미 추가된 새로운 노드들과의 엣지 생성
+            # 이미 추가된 새로운 노드들과의 엣지 생성 (육지 통과 검사 없음)
             for other_node in nodes:
                 if other_node == node or other_node not in self.nodes:
                     continue
@@ -77,9 +85,8 @@ class MNetwork(Marnet):
                     self.add_edge(node, other_node, weight=dist)
                     all_created_edges.append((node, other_node, dist))
                     
-        for edge in all_created_edges:
-            self.add_edge(edge[0], edge[1], weight=edge[2])
         print(f"Added {len(all_created_edges)} edges")
+        return all_created_edges
 
     def _extract_point_coordinates(self, point: geojson.Point):
         """
@@ -126,11 +133,12 @@ class MNetwork(Marnet):
         nodes = [tuple(coord[:2]) for coord in coords]
         return self.add_nodes_with_edges(nodes, threshold)
 
-    def add_geojson_feature_collection(self, feature_collection, threshold: float = 100.0):
+    def add_geojson_feature_collection(self, feature_collection, threshold: float = 100.0, land_polygon = None):
         """
         GeoJSON FeatureCollection의 Point 피처들을 노드로 추가하고 임계값 내의 노드들과 엣지를 생성합니다.
         :param feature_collection: Point 피처들을 포함한 FeatureCollection 객체
         :param threshold: 엣지를 생성할 거리 임계값(km)
+        :param land_polygon: 육지 폴리곤 (shapely MultiPolygon)
         :return: 생성된 엣지들의 리스트
         """
         if isinstance(feature_collection, dict):
@@ -153,7 +161,7 @@ class MNetwork(Marnet):
                     if coords and len(coords) >= 2:
                         nodes.append(tuple(coords[:2]))
                         
-        return self.add_nodes_with_edges(nodes, threshold)
+        return self.add_nodes_with_edges(nodes, threshold, land_polygon)
     
     def to_geojson(self, file_path: str = None) -> geojson.FeatureCollection:
         """노드와 엣지를 GeoJSON 형식으로 내보냅니다."""
