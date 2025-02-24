@@ -7,7 +7,7 @@ __all__ = (
     # geojson_utils
     ["load_geojson"]
     # map_utils
-    + ["map_folium", "map_folium_marnet"]
+    + ["map_folium"]
     # route_utils
     + [
         "convert_gpkg_to_geojson",
@@ -28,5 +28,7 @@ __all__ = (
         "extract_linestrings_from_geojson_file",
         "is_valid_edge",
         "remove_edges_cross_land",
+        "load_land_polygon",
+        "load_land_polygon_test",
     ]
 )
