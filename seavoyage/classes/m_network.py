@@ -135,8 +135,8 @@ class MNetwork(Marnet):
 
     def add_geojson_feature_collection(self, feature_collection, threshold: float = 100.0, land_polygon = None):
         """
-        GeoJSON FeatureCollection의 Point 피처들을 노드로 추가하고 임계값 내의 노드들과 엣지를 생성합니다.
-        :param feature_collection: Point 피처들을 포함한 FeatureCollection 객체
+        GeoJSON FeatureCollection의 Point와 LineString 피처들을 노드와 엣지로 추가합니다.
+        :param feature_collection: Point 또는 LineString 피처들을 포함한 FeatureCollection 객체
         :param threshold: 엣지를 생성할 거리 임계값(km)
         :param land_polygon: 육지 폴리곤 (shapely MultiPolygon)
         :return: 생성된 엣지들의 리스트
@@ -147,21 +147,95 @@ class MNetwork(Marnet):
             features = feature_collection.features
 
         nodes = []
+        direct_edges = []  # LineString에서 직접 추출한 엣지들을 저장할 리스트
+        
         for feature in features:
             if isinstance(feature, dict):
                 geometry = feature.get('geometry', {})
+                properties = feature.get('properties', {})
+                
                 if geometry.get('type') == 'Point':
                     coords = geometry.get('coordinates')
                     if coords and len(coords) >= 2:
                         nodes.append(tuple(coords[:2]))
+                        
+                elif geometry.get('type') == 'LineString':
+                    # LineString 처리
+                    coords = geometry.get('coordinates')
+                    if coords and len(coords) >= 2:
+                        # LineString의 각 좌표를 노드로 추가
+                        line_nodes = [tuple(coord[:2]) for coord in coords]
+                        nodes.extend(line_nodes)
+                        
+                        # LineString의 연속된 좌표 사이에 직접 엣지 생성
+                        for i in range(len(line_nodes) - 1):
+                            node1 = line_nodes[i]
+                            node2 = line_nodes[i + 1]
+                            
+                            # 가중치 계산 (properties에서 가져오거나 거리 계산)
+                            if 'weight' in properties:
+                                weight = properties['weight']
+                            else:
+                                weight = distance(node1, node2, units="km")
+                                
+                            direct_edges.append((node1, node2, weight, properties))
             else:
                 geometry = feature.geometry
+                properties = feature.properties if hasattr(feature, 'properties') else {}
+                
                 if isinstance(geometry, geojson.Point):
                     coords = geometry.coordinates
                     if coords and len(coords) >= 2:
                         nodes.append(tuple(coords[:2]))
                         
-        return self.add_nodes_with_edges(nodes, threshold, land_polygon)
+                elif isinstance(geometry, geojson.LineString):
+                    # LineString 처리
+                    coords = geometry.coordinates
+                    if coords and len(coords) >= 2:
+                        # LineString의 각 좌표를 노드로 추가
+                        line_nodes = [tuple(coord[:2]) for coord in coords]
+                        nodes.extend(line_nodes)
+                        
+                        # LineString의 연속된 좌표 사이에 직접 엣지 생성
+                        for i in range(len(line_nodes) - 1):
+                            node1 = line_nodes[i]
+                            node2 = line_nodes[i + 1]
+                            
+                            # 가중치 계산 (properties에서 가져오거나 거리 계산)
+                            if hasattr(properties, 'weight') or (isinstance(properties, dict) and 'weight' in properties):
+                                weight = properties.get('weight') if isinstance(properties, dict) else properties.weight
+                            else:
+                                weight = distance(node1, node2, units="km")
+                                
+                            direct_edges.append((node1, node2, weight, properties))
+        
+        # 노드들 추가 및 임계값 내 엣지 생성
+        all_created_edges = self.add_nodes_with_edges(nodes, threshold, land_polygon)
+        
+        # LineString에서 직접 추출한 엣지들 추가
+        for node1, node2, weight, props in direct_edges:
+            if node1 in self.nodes and node2 in self.nodes:
+                # 육지 폴리곤이 주어진 경우, 엣지가 육지를 통과하는지 검사
+                if land_polygon:
+                    line = LineString([node1, node2])
+                    if not is_valid_edge(line, land_polygon):
+                        continue
+                
+                # 엣지 속성 설정
+                edge_attrs = {'weight': weight}
+                
+                # properties의 다른 속성들도 엣지 속성에 추가
+                if isinstance(props, dict):
+                    for key, value in props.items():
+                        if key != 'weight':  # weight는 이미 설정했으므로 중복 방지
+                            edge_attrs[key] = value
+                
+                # 엣지 추가
+                self.add_edge(node1, node2, **edge_attrs)
+                all_created_edges.append((node1, node2, weight))
+        
+        print(f"총 {len(all_created_edges)}개의 엣지가 추가되었습니다.")
+        return all_created_edges
     
     def to_geojson(self, file_path: str = None) -> geojson.FeatureCollection:
         """노드와 엣지를 GeoJSON 형식으로 내보냅니다."""

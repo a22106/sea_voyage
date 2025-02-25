@@ -29,6 +29,5 @@ __all__ = (
         "is_valid_edge",
         "remove_edges_cross_land",
         "load_land_polygon",
-        "load_land_polygon_test",
     ]
 )
