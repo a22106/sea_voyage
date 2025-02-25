@@ -1,8 +1,7 @@
-# route_utils.py
+# seavoyage/utils/route_utils.py
 import geojson
 import geopandas as gpd
-import os
-from pathlib import Path
+import fiona
 
 import searoute as sr
 from searoute.utils import distance
@@ -12,7 +11,10 @@ from seavoyage.classes.m_network import MNetwork
 from seavoyage.utils.geojson_utils import load_geojson
 from seavoyage.settings import MARNET_DIR
 
-
+def print_gpkg_layers(gpkg_file: str):
+    layers = fiona.listlayers(gpkg_file)
+    print("레이어 목록:", layers)
+    
 def convert_gpkg_to_geojson(gpkg_file: str, output_geojson: str = ""):
     layer_name = "type"  # 변환할 레이어 이름 (gpkg 파일 내의 실제 레이어 이름으로 변경)
     if not output_geojson:

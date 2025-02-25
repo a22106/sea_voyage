@@ -1,10 +1,9 @@
-# shapely_utils.py
+# seavoyage/utils/shapely_utils.py
 import numpy as np
 from shapely import LineString
 import geojson
 import geopandas as gpd
 
-from seavoyage.classes.m_network import MNetwork
 from shapely import MultiPoint, MultiPolygon, Point
 from shapely.prepared import prep, PreparedGeometry
 
@@ -86,7 +85,7 @@ def is_valid_edge(
     
     return True
 
-def remove_edges_cross_land(marnet: MNetwork, land_polygon: MultiPolygon) -> MNetwork:
+def remove_edges_cross_land(marnet, land_polygon: MultiPolygon):
     """
     marnet에서 육지 폴리곤과 교차하는 간선을 제거
     :param marnet: MNetwork 객체
@@ -111,6 +110,16 @@ def remove_edges_cross_land(marnet: MNetwork, land_polygon: MultiPolygon) -> MNe
     
     return marnet
 
+# def load_land_polygon(file_path: str) -> MultiPolygon:
+#     """
+#     shapefile, gpkg 파일에서 MultiPolygon 객체로 반환
+#     :param file_path: shapefile, gpkg 파일 경로
+#     :return: MultiPolygon 객체
+#     """
+#     gdf: gpd.GeoDataFrame = gpd.read_file(file_path)
+#     return gdf.union_all()
+
+
 def load_land_polygon(file_path: str) -> MultiPolygon:
     """
     shapefile, gpkg 파일에서 MultiPolygon 객체로 반환
@@ -118,15 +127,9 @@ def load_land_polygon(file_path: str) -> MultiPolygon:
     :return: MultiPolygon 객체
     """
     gdf: gpd.GeoDataFrame = gpd.read_file(file_path)
-    return gdf.union_all()
-
-
-def load_land_polygon_test(file_path: str) -> MultiPolygon:
-    """
-    shapefile, gpkg 파일에서 MultiPolygon 객체로 반환
-    :param file_path: shapefile, gpkg 파일 경로
-    :return: MultiPolygon 객체
-    """
-    gdf: gpd.GeoDataFrame = gpd.read_file(file_path)
     gdf['geometry'] = gdf['geometry'].make_valid()
-    return gdf.union_all()
+    try:
+        return gdf.union_all(method='coverage')
+    except:
+        # coverage method가 실패하면 unary method 시도
+        return gdf.union_all(method='unary')
